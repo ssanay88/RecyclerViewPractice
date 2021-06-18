@@ -1,15 +1,30 @@
 package com.example.recyclerviewpractice
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.LinearLayout
+import android.util.Log
+import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.recyclerviewpractice.databinding.ActivityMainBinding
+import com.example.recyclerviewpractice.databinding.RecyclerviewItemBinding
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     // Datas 타입의 리스트
     var datas = mutableListOf<Datas>()
+
+    // 오늘 날짜로 캘린더 객체 생성
+    val calendar: Calendar = Calendar.getInstance()
+    var TAG : String = "로그"
+
+
+    // 년도, 월, 일 변수를 선언
+    var selected_year = calendar.get(Calendar.YEAR)
+    var selected_month = calendar.get(Calendar.MONTH) + 1
+    var selected_day = calendar.get(Calendar.DAY_OF_MONTH)
+    var selected_date : String = selected_year.toString() + selected_month.toString() + selected_day.toString()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +55,29 @@ class MainActivity : AppCompatActivity() {
             myAdapter.datas = datas
             myAdapter.notifyDataSetChanged()
         }
+
+        mainbinding.CalendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
+
+            selected_day = dayOfMonth
+            selected_month = month+1
+            selected_year = year
+            selected_date = selected_year.toString() + selected_month.toString() + selected_day.toString()
+            Log.d(TAG,"오늘 날짜는 $year - ${month+1} - $dayOfMonth 입니다.")
+        }
+
+
+        myAdapter.setonBtnClickListener(object : MyAdapter.onBtnClickListener{
+            override fun onBtnClick(v : RecyclerviewItemBinding,datas: Datas) {
+
+            var intent = Intent(this@MainActivity,MainActivity2::class.java).apply {
+                putExtra("NUM", datas.num.toString())
+                putExtra("DATE", selected_date)
+            }
+            startActivity(intent)
+            }
+        })
+
+
 
     }
 
